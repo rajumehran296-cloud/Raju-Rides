@@ -14,9 +14,7 @@ class RajuRidesApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'RAJU RIDES',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.green,
-        ),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
         useMaterial3: true,
       ),
       home: const HomePage(),
@@ -24,8 +22,45 @@ class RajuRidesApp extends StatelessWidget {
   }
 }
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final pickupController = TextEditingController();
+  final destinationController = TextEditingController();
+
+  String selectedRide = 'RAJU Economy';
+
+  @override
+  void dispose() {
+    pickupController.dispose();
+    destinationController.dispose();
+    super.dispose();
+  }
+
+  void bookRide() {
+    if (pickupController.text.trim().isEmpty ||
+        destinationController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter pickup and destination'),
+        ),
+      );
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Request prepared: $selectedRide',
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,8 +71,8 @@ class HomePage extends StatelessWidget {
         title: const Text(
           'RAJU RIDES',
           style: TextStyle(
-            fontWeight: FontWeight.bold,
             color: Colors.green,
+            fontWeight: FontWeight.bold,
           ),
         ),
         actions: const [
@@ -58,33 +93,40 @@ class HomePage extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-          Container(
-            padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(18),
-            ),
-            child: const Column(
-              children: [
-                Row(
-                  children: [
-                    Icon(Icons.my_location, color: Colors.green),
-                    SizedBox(width: 12),
-                    Text('Your pickup location'),
-                  ],
-                ),
-                Divider(height: 30),
-                Row(
-                  children: [
-                    Icon(Icons.location_on, color: Colors.red),
-                    SizedBox(width: 12),
-                    Text('Choose your destination'),
-                  ],
-                ),
-              ],
+          TextField(
+            controller: pickupController,
+            decoration: InputDecoration(
+              prefixIcon: const Icon(
+                Icons.my_location,
+                color: Colors.green,
+              ),
+              hintText: 'Enter pickup location',
+              filled: true,
+              fillColor: Colors.white,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: BorderSide.none,
+              ),
             ),
           ),
-          const SizedBox(height: 22),
+          const SizedBox(height: 12),
+          TextField(
+            controller: destinationController,
+            decoration: InputDecoration(
+              prefixIcon: const Icon(
+                Icons.location_on,
+                color: Colors.red,
+              ),
+              hintText: 'Enter destination',
+              filled: true,
+              fillColor: Colors.white,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: BorderSide.none,
+              ),
+            ),
+          ),
+          const SizedBox(height: 25),
           const Text(
             'Choose your ride',
             style: TextStyle(
@@ -92,14 +134,27 @@ class HomePage extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 14),
-          rideCard(Icons.directions_car, 'RAJU Economy', 'Affordable rides'),
-          rideCard(Icons.local_taxi, 'RAJU Comfort', 'Comfortable travel'),
-          rideCard(Icons.airport_shuttle, 'RAJU XL', 'For more passengers'),
-          const SizedBox(height: 24),
+          const SizedBox(height: 12),
+          rideOption(
+            Icons.directions_car,
+            'RAJU Economy',
+            'Affordable rides',
+          ),
+          rideOption(
+            Icons.local_taxi,
+            'RAJU Comfort',
+            'Comfortable travel',
+          ),
+          rideOption(
+            Icons.airport_shuttle,
+            'RAJU XL',
+            'For more passengers',
+          ),
+          const SizedBox(height: 22),
           SizedBox(
             height: 55,
             child: ElevatedButton(
+              onPressed: bookRide,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
                 foregroundColor: Colors.white,
@@ -107,7 +162,6 @@ class HomePage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(14),
                 ),
               ),
-              onPressed: () {},
               child: const Text(
                 'BOOK A RIDE',
                 style: TextStyle(
@@ -126,14 +180,28 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget rideCard(IconData icon, String title, String subtitle) {
+  Widget rideOption(
+    IconData icon,
+    String title,
+    String subtitle,
+  ) {
+    final isSelected = selectedRide == title;
+
     return Card(
-      color: Colors.white,
+      color: isSelected ? Colors.green.shade50 : Colors.white,
       child: ListTile(
+        onTap: () {
+          setState(() {
+            selectedRide = title;
+          });
+        },
         leading: Icon(icon, color: Colors.green, size: 32),
         title: Text(title),
         subtitle: Text(subtitle),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+        trailing: Icon(
+          isSelected ? Icons.check_circle : Icons.circle_outlined,
+          color: Colors.green,
+        ),
       ),
     );
   }
