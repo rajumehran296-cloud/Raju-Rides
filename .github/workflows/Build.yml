@@ -26,8 +26,7 @@ jobs:
           channel: stable
 
       - name: Create Flutter project
-        run: flutter create .
-
+        run: flutter create --project-name raju_rides .
       - name: Get packages
         run: flutter pub get
 
